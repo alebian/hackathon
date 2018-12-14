@@ -1,19 +1,33 @@
 package main
 
 import (
-  "fmt"
-  "context"
-  "github.com/aws/aws-lambda-go/lambda"
+	"encoding/json"
+	awsEvents "github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type Event struct {
-  Name string `json:"name"`
+type Parameters struct {
+	name string `json:"name"`
 }
 
-func HandleRequest(ctx context.Context, event Event) (string, error) {
-  return fmt.Sprintf("Hello %s!", event.Name ), nil
+func Handle(request awsEvents.APIGatewayProxyRequest) (response awsEvents.APIGatewayProxyResponse, err error) {
+	jsonBody := make(map[string]string)
+	jsonBody["event"] = request.QueryStringParameters["name"]
+
+	body, err := json.Marshal(jsonBody)
+	if err != nil {
+		return
+	}
+
+	response = awsEvents.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers:    map[string]string{"Content-Type": "application/json"},
+		Body:       string(body),
+	}
+
+	return
 }
 
 func main() {
-  lambda.Start(HandleRequest)
+	lambda.Start(Handle)
 }
