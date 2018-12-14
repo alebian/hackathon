@@ -12,14 +12,23 @@ services:
     volumes:
       - faktory-data:/var/lib/faktory
 
-  hackathon:
+  worker:
     build: .
+    environment:
+      - FAKTORY_URL=tcp://:increase@faktory:7419
+      - WORKER=TRUE
+    networks:
+      - default
+
+  api:
+    build: .
+    environment:
+      - FAKTORY_URL=tcp://:increase@faktory:7419
+      - WORKER=FALSE
     ports:
       - 8080:8080
     networks:
       - default
-    depends_on:
-      - faktory
 
 networks:
   default:

@@ -5,6 +5,7 @@ RUN apk update && \
 
 # Download the dependencies manually to use Docker cache
 RUN go get github.com/gin-gonic/gin
+RUN go get github.com/contribsys/faktory_worker_go
 
 COPY . $GOPATH/src/hackathon/
 WORKDIR $GOPATH/src/hackathon/
