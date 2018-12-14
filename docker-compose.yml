@@ -19,6 +19,8 @@ services:
       - WORKER=TRUE
     networks:
       - default
+    depends_on:
+      - faktory
 
   api:
     build: .
@@ -29,6 +31,8 @@ services:
       - 8080:8080
     networks:
       - default
+    depends_on:
+      - faktory
 
 networks:
   default:

@@ -1,13 +1,18 @@
 package main
 
 import (
-	"fmt"
 	faktory "github.com/contribsys/faktory/client"
 	ourWorker "hackathon/worker"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 )
+
+type Job struct {
+	Lambda string `json:"lambda"`
+	Args   string `json:"args"`
+}
 
 func main() {
 	work, ok := os.LookupEnv("WORKER")
@@ -17,19 +22,35 @@ func main() {
 
 		} else {
 			r := gin.Default()
-			r.GET("/ping", func(c *gin.Context) {
 
+			r.POST("/job", func(c *gin.Context) {
 				var err error
+
+				var json Job
+				if err := c.BindJSON(&json); err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
+
 				client, err := faktory.Open()
 				if err != nil {
-					fmt.Println("Failed to open faktory client")
-				}
-				job := faktory.NewJob("SomeJob", 1, 2, 3)
-				err = client.Push(job)
-				if err != nil {
-					fmt.Println("Failed to push job to faktory")
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
 				}
 
+				job := faktory.NewJob("LambdaEnqueuer", json.Lambda, json.Args)
+				err = client.Push(job)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					return
+				}
+
+				c.JSON(201, gin.H{
+					"message": "ok",
+				})
+			})
+
+			r.GET("/ping", func(c *gin.Context) {
 				c.JSON(200, gin.H{
 					"message": "pong",
 				})
