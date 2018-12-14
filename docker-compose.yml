@@ -1,0 +1,23 @@
+version: '3.3'
+services:
+  faktory:
+    image: contribsys/faktory
+    environment:
+      - FAKTORY_PASSWORD=increase
+    ports:
+      - 7419:7419
+      - 7420:7420
+    networks:
+      - default
+    volumes:
+      - faktory-data:/var/lib/faktory
+
+  hackathon:
+    build: .
+    networks:
+      - default
+
+networks:
+  default:
+volumes:
+  faktory-data:
