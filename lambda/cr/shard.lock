@@ -1,0 +1,6 @@
+version: 1.0
+shards:
+  crambda:
+    github: lambci/crambda
+    commit: 66e6043ba5ffc3a804704947e72898dc8d9eeaa8
+
