@@ -14,8 +14,12 @@ services:
 
   hackathon:
     build: .
+    ports:
+      - 8080:8080
     networks:
       - default
+    depends_on:
+      - faktory
 
 networks:
   default:
